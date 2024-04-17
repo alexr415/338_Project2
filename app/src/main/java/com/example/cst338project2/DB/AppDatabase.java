@@ -50,13 +50,17 @@ public abstract class AppDatabase extends RoomDatabase {
             super.onCreate(db);
             databaseWriteExecutor.execute(() -> {
                 UserDAO userDAO = instance.userDAO();
-                //ScoreDAO scoreDAO = instance.scoreDAO();
+                ScoreDAO scoreDAO = instance.scoreDAO();
                 // add delete alls for all tables
                 User admin  = new User("admin1","admin1",true);
                 User user = new User("testuser1","testuser1",false);
-               // scoreDAO.insert(new Score(1,1,3));
+                Score score = new Score(1,1,"Game");
+                Score score2 = new Score(2,2,"Game");
+             ;
                 userDAO.insert(admin);
                 userDAO.insert(user);
+                scoreDAO.insert(score);
+                scoreDAO.insert(score2);
             });
         }
     };
