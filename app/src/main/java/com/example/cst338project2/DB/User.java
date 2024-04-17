@@ -1,17 +1,16 @@
-package com.example.cst338project2;
+package com.example.cst338project2.DB;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.example.cst338project2.DB.AppDatabase;
-
 @Entity (tableName =AppDatabase.USER_TABLE)
 public class User {
-    @NonNull
-    @PrimaryKey(autoGenerate = false)
+
+    @PrimaryKey(autoGenerate = true)
+    private int userId;
     private String username;
-    @NonNull
+
     private String password;
 
     private boolean isAdmin;
@@ -25,6 +24,14 @@ public class User {
 
     public boolean isAdmin() {
         return isAdmin;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public void setAdmin(boolean admin) {
