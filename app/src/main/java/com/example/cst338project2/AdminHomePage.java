@@ -5,17 +5,29 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.cst338project2.DB.AppRepository;
+import com.example.cst338project2.DB.User;
 import com.example.cst338project2.databinding.ActivityAdminHomePageBinding;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AdminHomePage extends AppCompatActivity {
     private ActivityAdminHomePageBinding binding;
+    private userListAdapter userListAdptr;
+    LiveData<List<User>> userLiveData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +36,47 @@ public class AdminHomePage extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         SharedPreferences sharedPref = this.getSharedPreferences(MainActivity.preference_file_key, Context.MODE_PRIVATE);
+
+        AppRepository repo = new AppRepository(getApplication());
+        ArrayList<User> users = repo.getAllUsers();
+        StringBuilder sb = new StringBuilder();
+        for (User user : users) {
+            sb.append("Username: " + user.getUsername()+"\tUserID: " +user.getUserId()+"\n\n");
+        }
+        binding.adminUserListTextView.setText(sb.toString());
+
+        userLiveData = repo.getUsersLiveData();
+
+        userLiveData.observe(this, new Observer<List<User>>() {
+            @Override
+            public void onChanged(List<User> users) {
+                StringBuilder sb = new StringBuilder();
+                for (User user : users) {
+                    sb.append("Username: " + user.getUsername()+"\tUserID: " +user.getUserId()+"\n\n");
+                }
+                binding.adminUserListTextView.setText(sb.toString());
+            }
+        });
+
+        binding.DeleteUserButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(binding.userToDeleteIDinput.getText().toString().isEmpty()){
+                    Toast.makeText(getApplicationContext(), "Please enter a UserID to delete", Toast.LENGTH_SHORT).show();
+
+                } else if (repo.getUserByID(Integer.parseInt(binding.userToDeleteIDinput.getText().toString())).size() == 0){
+                    Toast.makeText(getApplicationContext(), "User doesn't exist", Toast.LENGTH_SHORT).show();
+                } else if (repo.getUserByID(Integer.parseInt(binding.userToDeleteIDinput.getText().toString())).get(0).isAdmin()) {
+                    Toast.makeText(getApplicationContext(), "ADMINS ARE FOREVER", Toast.LENGTH_SHORT).show();
+                } else{
+                    int id = Integer.parseInt(binding.userToDeleteIDinput.getText().toString());
+                    repo.deleteScoresByUserId(id);
+                    repo.deleteUserById(id);
+
+
+                }
+            }
+        });
 
         binding.adminLogOutButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -49,14 +49,14 @@ public class PlayerHomePageActivity extends AppCompatActivity {
         binding.playGamesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                binding.gameOptionsFragmentView.setVisibility(View.VISIBLE);
+                binding.gameOptionsFragmentContainerView.setVisibility(View.VISIBLE);
                 binding.highScoresFragmentContainerView.setVisibility(View.INVISIBLE);
             }
         });
         binding.showHighScoresButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                binding.gameOptionsFragmentView.setVisibility(View.INVISIBLE);
+                binding.gameOptionsFragmentContainerView.setVisibility(View.INVISIBLE);
                 binding.highScoresFragmentContainerView.setVisibility(View.VISIBLE);
             }
         });

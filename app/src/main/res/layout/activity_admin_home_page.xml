@@ -46,25 +46,15 @@
             app:layout_constraintHorizontal_bias="0.496" />
 
     <Button
-            android:text="Show users"
+            android:text="Delete User"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:id="@+id/button"
-            app:layout_constraintTop_toBottomOf="@+id/adminGreetingTextView"
-            android:layout_marginTop="64dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-    <Button
-            android:text="Edit Users"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button2"
+            android:id="@+id/DeleteUserButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button"
-            android:layout_marginTop="20dp" />
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintTop_toBottomOf="@+id/userToDeleteIDinput"
+            android:layout_marginTop="44dp" />
 
     <Button
             android:text="Log Out"
@@ -76,5 +66,29 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp" />
+
+    <TextView
+            android:text="TextView"
+            android:layout_width="220dp"
+            android:layout_height="262dp"
+            android:id="@+id/adminUserListTextView"
+            app:layout_constraintTop_toBottomOf="@+id/adminGreetingTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="48dp"
+            app:layout_constraintHorizontal_bias="0.492" />
+
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:hint="Enter User ID to Delete"
+            android:id="@+id/userToDeleteIDinput"
+            app:layout_constraintTop_toBottomOf="@+id/adminUserListTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="16dp"
+            app:layout_constraintHorizontal_bias="0.497" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

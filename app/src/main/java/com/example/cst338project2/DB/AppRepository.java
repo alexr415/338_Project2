@@ -2,6 +2,8 @@ package com.example.cst338project2.DB;
 
 import android.app.Application;
 
+import androidx.lifecycle.LiveData;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -37,6 +39,55 @@ public class AppRepository {
         }
         return null;
 
+    }
+
+    public int getHighScoreByUserAndGame(int user_id, String game) {
+        Future<Integer> future = AppDatabase.databaseWriteExecutor.submit(
+                new Callable<Integer>() {
+                    @Override
+                    public Integer call() throws Exception {
+                        return scoreDAO.getHighScoreByUserAndGame(user_id, game);
+                    }
+                }
+        );
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    public int getHighScoreByGame(String game) {
+        Future<Integer> future = AppDatabase.databaseWriteExecutor.submit(
+                new Callable<Integer>() {
+                    @Override
+                    public Integer call() throws Exception {
+                        return scoreDAO.getHighScoreByGame(game);
+                    }
+                }
+        );
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public void deleteUserById(int id) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            userDAO.deleteUserById(id);
+        });
+    }
+
+    public void deleteScoresByUserId(int id) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            scoreDAO.deleteScoresByUserId(id);
+        });
+    }
+
+    public LiveData<List<User>> getUsersLiveData() {
+        return userDAO.getUsersLiveData();
     }
 
     public ArrayList<User> getAllUsers() {

@@ -23,4 +23,14 @@ public interface ScoreDAO {
 
     @Query("SELECT * FROM " + AppDatabase.SCORE_TABLE + " WHERE game = :game")
     List<Score> getScoreByGame (String game);
+
+    @Query("SELECT max(score) FROM " + AppDatabase.SCORE_TABLE + " WHERE userId = :user_id AND game=:game")
+    int getHighScoreByUserAndGame(int user_id, String game);
+
+    @Query("SELECT max(score) FROM " + AppDatabase.SCORE_TABLE + " WHERE game=:game")
+    int getHighScoreByGame(String game);
+
+    @Query("DELETE FROM " + AppDatabase.SCORE_TABLE + " WHERE userId = :id")
+    void deleteScoresByUserId(int id);
+
 }

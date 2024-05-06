@@ -1,6 +1,5 @@
-package com.example.cst338project2;
+package com.example.cst338project2.typeConverters;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -11,17 +10,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.cst338project2.DB.AppRepository;
+import com.example.cst338project2.R;
+import com.example.cst338project2.databinding.ActivityNumberGuessingGameBinding;
 import com.example.cst338project2.databinding.FragmentGameOptionsBinding;
-import com.example.cst338project2.databinding.FragmentHighScoresDisplayBinding;
+import com.example.cst338project2.numberGuessingGameActivity;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link HighScoresDisplay#newInstance} factory method to
+ * Use the {@link GameOptions#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HighScoresDisplay extends Fragment {
-
+public class GameOptions extends Fragment {
+    private FragmentGameOptionsBinding binding;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -31,7 +31,7 @@ public class HighScoresDisplay extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public HighScoresDisplay() {
+    public GameOptions() {
         // Required empty public constructor
     }
 
@@ -41,17 +41,18 @@ public class HighScoresDisplay extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment HighScoresDisplay.
+     * @return A new instance of fragment GameOptions.
      */
     // TODO: Rename and change types and number of parameters
-    public static HighScoresDisplay newInstance(String param1, String param2) {
-        HighScoresDisplay fragment = new HighScoresDisplay();
+    public static GameOptions newInstance(String param1, String param2) {
+        GameOptions fragment = new GameOptions();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,28 +61,36 @@ public class HighScoresDisplay extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_high_scores_display, container, false);
+
+
+        return inflater.inflate(R.layout.fragment_game_options, container, false);
     }
-    private FragmentHighScoresDisplayBinding binding;
+
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
 
-        binding = FragmentHighScoresDisplayBinding.bind(view);
-
-        AppRepository repo = new AppRepository(getActivity().getApplication());
-        repo.getHighScoreByGame(numberGuessingGameActivity.GAME_TAG);
-
-        binding.highScoreFragmentTextView.setText("High Score: " + repo.getHighScoreByGame(numberGuessingGameActivity.GAME_TAG));
-        
+        binding = FragmentGameOptionsBinding.bind(view);
 
 
+
+
+
+        binding.numGuessingGameSelectionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = numberGuessingGameActivity.numberGuessingGameActivityIntentFactory(getContext());
+                startActivity(intent);
+            }
+        });
     }
+
 
 }

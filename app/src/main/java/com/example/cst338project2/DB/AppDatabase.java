@@ -8,6 +8,8 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.example.cst338project2.numberGuessingGameActivity;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -54,13 +56,13 @@ public abstract class AppDatabase extends RoomDatabase {
                 // add delete alls for all tables
                 User admin  = new User("admin1","admin1",true);
                 User user = new User("testuser1","testuser1",false);
-                Score score = new Score(1,1,"Game");
-                Score score2 = new Score(2,2,"Game");
-             ;
+                Score score = new Score(1,1, numberGuessingGameActivity.GAME_TAG);
+                Score score2 = new Score(2,2,numberGuessingGameActivity.GAME_TAG);
+
                 userDAO.insert(admin);
                 userDAO.insert(user);
-                scoreDAO.insert(score);
                 scoreDAO.insert(score2);
+                scoreDAO.insert(score);
             });
         }
     };

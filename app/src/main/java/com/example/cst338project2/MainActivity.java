@@ -63,14 +63,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(validateInput()){
-                    List<User> users = userDAO.getUsers();
+                    List<User> users = repo.getAllUsers();
                     for (User user: users){
                         if(user.getUsername().equals(binding.usernameInput.getText().toString())){
                             Toast.makeText(MainActivity.this, "Username already exists!", Toast.LENGTH_SHORT).show();
                             return;
                         }
                     }
-                    userDAO.insert(createUserFromInput());
+                    repo.insertUser(createUserFromInput());
 
                 }
                 Toast.makeText(MainActivity.this, "Account created successfully!", Toast.LENGTH_SHORT).show();
