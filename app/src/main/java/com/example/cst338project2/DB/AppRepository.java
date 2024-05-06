@@ -13,14 +13,17 @@ import java.util.concurrent.Future;
 public class AppRepository {
     private final UserDAO userDAO;
     private final ScoreDAO scoreDAO;
+    private final MessageDAO messageDAO;
     private List<User> allUsers;
 
     public AppRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         this.userDAO = db.userDAO();
         this.scoreDAO = db.scoreDAO();
+        this.messageDAO = db.messageDAO();
 
     }
+
 
     public ArrayList<User> getUserByID(int id) {
         Future<ArrayList<User>> future = AppDatabase.databaseWriteExecutor.submit(
@@ -57,6 +60,24 @@ public class AppRepository {
         }
         return -1;
     }
+
+    public List<User> getUserByUsername(String username) {
+        Future<List<User>> future = AppDatabase.databaseWriteExecutor.submit(
+                new Callable<List<User>>() {
+                    @Override
+                    public List<User> call() throws Exception {
+                        return userDAO.getUserByUsername(username);
+                    }
+                }
+        );
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public int getHighScoreByGame(String game) {
         Future<Integer> future = AppDatabase.databaseWriteExecutor.submit(
                 new Callable<Integer>() {
@@ -74,6 +95,12 @@ public class AppRepository {
         return -1;
     }
 
+    public void insertMessage(Message... message) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            messageDAO.insert(message);
+        });
+    }
+
     public void deleteUserById(int id) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             userDAO.deleteUserById(id);
@@ -85,6 +112,39 @@ public class AppRepository {
             scoreDAO.deleteScoresByUserId(id);
         });
     }
+    public void deleteAllScores() {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            scoreDAO.deleteAllScores();
+        });
+    }
+
+    public LiveData<List<Message>> getMessagesForReceiverLiveData(int receiverID) {
+        return messageDAO.getMessagesForReceiverLiveData(receiverID);
+    }
+
+    public List<Message> getMessagesForReceiver(int receiverID) {
+        Future<List<Message>> future = AppDatabase.databaseWriteExecutor.submit(
+                new Callable<List<Message>>() {
+                    @Override
+                    public List<Message> call() throws Exception {
+                        return messageDAO.getMessagesForReceiver(receiverID);
+                    }
+                }
+        );
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void deleteMessagesForReceiver(int receiverID) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            messageDAO.deleteMessagesForReceiver(receiverID);
+        });
+    }
+
 
     public LiveData<List<User>> getUsersLiveData() {
         return userDAO.getUsersLiveData();

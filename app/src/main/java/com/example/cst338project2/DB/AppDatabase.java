@@ -13,12 +13,12 @@ import com.example.cst338project2.numberGuessingGameActivity;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {User.class, Score.class}, version = 1, exportSchema = false)
+@Database(entities = {User.class, Score.class, Message.class}, version = 1, exportSchema = false)
 
 public abstract class AppDatabase extends RoomDatabase {
     public static final String USER_TABLE = "user";
     public static final String DATABASE_NAME = "AppDB";
-    public static final String SCORE_TABLE = "score" ;
+    public static final String SCORE_TABLE = "score";
     public static final String MESSAGE_TABLE = "message";
     private static volatile AppDatabase instance;
     private static final Object LOCK = new Object();
@@ -27,6 +27,10 @@ public abstract class AppDatabase extends RoomDatabase {
     private static final int NUMBER_OF_THREADS = 4;
     static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
+
+    public abstract ScoreDAO scoreDAO();
+
+    public abstract MessageDAO messageDAO();
 
     public abstract UserDAO userDAO();
 
@@ -53,19 +57,24 @@ public abstract class AppDatabase extends RoomDatabase {
             databaseWriteExecutor.execute(() -> {
                 UserDAO userDAO = instance.userDAO();
                 ScoreDAO scoreDAO = instance.scoreDAO();
+                MessageDAO messageDAO = instance.messageDAO();
                 // add delete alls for all tables
-                User admin  = new User("admin1","admin1",true);
-                User user = new User("testuser1","testuser1",false);
-                Score score = new Score(1,1, numberGuessingGameActivity.GAME_TAG);
-                Score score2 = new Score(2,2,numberGuessingGameActivity.GAME_TAG);
+                User admin = new User("admin1", "admin1", true);
+                User user = new User("testuser1", "testuser1", false);
+                Score score = new Score(1, 1, numberGuessingGameActivity.GAME_TAG);
+                Score score2 = new Score(2, 2, numberGuessingGameActivity.GAME_TAG);
+                Message message = new Message(1, 1, "Welcome To Alex's Arcade App. I hope you enjoy", "Welcome");
+                Message message1 = new Message(1, 2, "Welcome To Alex's Arcade App. I hope you enjoy", "Welcome");
+
 
                 userDAO.insert(admin);
                 userDAO.insert(user);
                 scoreDAO.insert(score2);
                 scoreDAO.insert(score);
+                messageDAO.insert(message);
+                messageDAO.insert(message1);
+
             });
         }
     };
-
-    public abstract ScoreDAO scoreDAO();
 }
