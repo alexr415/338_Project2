@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".AdminHomePage">
+
+    <Button
+            android:text="Play"
+            android:textSize="9sp"
+            android:layout_width="81dp"
+            android:layout_height="42dp"
+            android:id="@+id/adminPlayButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.066" />
+
+    <TextView
+            android:id="@+id/adminGreetingTextView"
+            android:layout_width="204dp"
+            android:layout_height="41dp"
+            android:text="Hello Admin"
+            android:textSize="18sp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="144dp"
+            app:layout_constraintHorizontal_bias="0.497" />
+
+    <TextView
+            android:id="@+id/playerHomePage"
+            android:layout_width="250dp"
+            android:layout_height="75dp"
+            android:text="Admin Home Page"
+            android:textSize="24sp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="60dp"
+            app:layout_constraintHorizontal_bias="0.496" />
+
+    <Button
+            android:text="Delete User"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/DeleteUserButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintTop_toBottomOf="@+id/userToDeleteIDinput"
+            android:layout_marginTop="44dp" />
+
+    <Button
+            android:text="Log Out"
+            android:textSize="9sp"
+            android:layout_width="81dp"
+            android:layout_height="42dp"
+            android:id="@+id/adminLogOutButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp" />
+
+    <TextView
+            android:text="TextView"
+            android:layout_width="220dp"
+            android:layout_height="262dp"
+            android:id="@+id/adminUserListTextView"
+            app:layout_constraintTop_toBottomOf="@+id/adminGreetingTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="48dp"
+            app:layout_constraintHorizontal_bias="0.492" />
+
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:hint="Enter User ID to Delete"
+            android:id="@+id/userToDeleteIDinput"
+            app:layout_constraintTop_toBottomOf="@+id/adminUserListTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="16dp"
+            app:layout_constraintHorizontal_bias="0.497" />
+
+    <Button
+            android:text="Clear High Scores"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ClearHighScoresButton"
+            app:layout_constraintTop_toBottomOf="@+id/DeleteUserButton"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

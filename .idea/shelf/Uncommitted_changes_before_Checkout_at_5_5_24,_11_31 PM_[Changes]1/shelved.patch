@@ -1,0 +1,485 @@
+Index: app/src/main/java/com/example/cst338project2/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.cst338project2;\n\nimport androidx.appcompat.app.AppCompatActivity;\nimport androidx.room.Room;\n\nimport android.content.Context;\nimport android.content.Intent;\nimport android.content.SharedPreferences;\nimport android.os.Bundle;\nimport android.view.View;\nimport android.widget.Toast;\n\nimport com.example.cst338project2.DB.AppDatabase;\nimport com.example.cst338project2.DB.AppRepository;\nimport com.example.cst338project2.DB.User;\nimport com.example.cst338project2.DB.UserDAO;\nimport com.example.cst338project2.databinding.ActivityMainBinding;\n\nimport java.util.List;\n\npublic class MainActivity extends AppCompatActivity {\n    private ActivityMainBinding binding;\n    UserDAO userDAO;\n    protected static final String preference_file_key = \"com.example.cst338project2.preference_file_key\";\n    protected static final String logged_in_user_key = \"com.example.cst338project2.logged_in_user_key\";\n\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        SharedPreferences sharedPref = getSharedPreferences(preference_file_key, Context.MODE_PRIVATE);\n        super.onCreate(savedInstanceState);\n        binding = ActivityMainBinding.inflate(getLayoutInflater());\n        View view = binding.getRoot();\n        setContentView(view);\n        AppDatabase database = AppDatabase.getDatabase(getApplicationContext());\n        AppRepository repo = new AppRepository(getApplication());\n        if(sharedPref.getInt(logged_in_user_key,-1) != -1){\n            Intent intent = PlayerHomePageActivity.PlayerHomePageIntentFactory(getApplicationContext());\n            startActivity(intent);\n        }\n        //initialize the database\n\n//        userDAO = Room.databaseBuilder(this, AppDatabase.class, AppDatabase.DATABASE_NAME)\n//                .allowMainThreadQueries()\n//                .build()\n//                .userDAO();\n\n\n//        User admin  = new User(\"admin\",\"admin\",true);\n//        User user = new User(\"user\",\"user\",false);\n\n\n        repo.getAllUsers();\n\n        //add admin and user to the database if they do not exist\n//        if(userDAO.getUserByUsername(admin.getUsername()).isEmpty()) {\n//            userDAO.insert(admin);\n//        }\n//        if(userDAO.getUserByUsername(user.getUsername()).isEmpty()) {\n//            userDAO.insert(user);\n//        }\n\n        binding.signupButton.setOnClickListener(new View.OnClickListener() {\n            @Override\n            public void onClick(View v) {\n                if(validateInput()){\n                    List<User> users = repo.getAllUsers();\n                    for (User user: users){\n                        if(user.getUsername().equals(binding.usernameInput.getText().toString())){\n                            Toast.makeText(MainActivity.this, \"Username already exists!\", Toast.LENGTH_SHORT).show();\n                            return;\n                        }\n                    }\n                    repo.insertUser(createUserFromInput());\n\n                }\n                Toast.makeText(MainActivity.this, \"Account created successfully!\", Toast.LENGTH_SHORT).show();\n            }\n        });\n\n        binding.loginButton.setOnClickListener(new View.OnClickListener() {\n            @Override\n            public void onClick(View v) {\n                if(validateInput()){\n                    AppRepository appRepository = new AppRepository(getApplication());\n                    List<User> users = appRepository.getAllUsers();\n                    //check if the user exists in the database\n\n                    //if the user and password match, check if the user is an admin\n                    for(User user: users) {\n                        if(user.getUsername().equals(binding.usernameInput.getText().toString()) && user.getPassword().equals(binding.passwordInput.getText().toString())){\n\n                                SharedPreferences.Editor editor = sharedPref.edit();\n                                editor.putInt(logged_in_user_key, user.getUserId());\n                                editor.apply();\n                                Intent intent = PlayerHomePageActivity.PlayerHomePageIntentFactory(getApplicationContext());\n                                startActivity(intent);\n\n                            return;\n\n                        }\n                    }\n                    Toast.makeText(MainActivity.this, \"Invalid username or password\", Toast.LENGTH_SHORT).show();\n                    //if the user is an admin, display the admin activity\n                    //if the user is not an admin, display the user activity\n                    //if the user and password do not match, display an error message\n                }\n            }\n        });\n    }\n    private boolean validateInput(){\n        String username = binding.usernameInput.getText().toString();\n        String password = binding.passwordInput.getText().toString();\n        //Toast.makeText(this, \"Please enter a username and password\", Toast.LENGTH_SHORT).show();\n        // Toast.makeText(this, \"Login successful\", Toast.LENGTH_SHORT).show();\n        return !username.isEmpty() && !password.isEmpty();\n    }\n\n    private User createUserFromInput(){\n        return new User(binding.usernameInput.getText().toString(),binding.passwordInput.getText().toString(),false);\n    }\n\n    public static Intent MainActivityIntentFactory(Context context) {\n        return new Intent(context, MainActivity.class);\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/MainActivity.java b/app/src/main/java/com/example/cst338project2/MainActivity.java
+--- a/app/src/main/java/com/example/cst338project2/MainActivity.java	
++++ b/app/src/main/java/com/example/cst338project2/MainActivity.java	
+@@ -1,8 +1,5 @@
+ package com.example.cst338project2;
+ 
+-import androidx.appcompat.app.AppCompatActivity;
+-import androidx.room.Room;
+-
+ import android.content.Context;
+ import android.content.Intent;
+ import android.content.SharedPreferences;
+@@ -10,8 +7,11 @@
+ import android.view.View;
+ import android.widget.Toast;
+ 
++import androidx.appcompat.app.AppCompatActivity;
++
+ import com.example.cst338project2.DB.AppDatabase;
+ import com.example.cst338project2.DB.AppRepository;
++import com.example.cst338project2.DB.Message;
+ import com.example.cst338project2.DB.User;
+ import com.example.cst338project2.DB.UserDAO;
+ import com.example.cst338project2.databinding.ActivityMainBinding;
+@@ -33,44 +33,28 @@
+         setContentView(view);
+         AppDatabase database = AppDatabase.getDatabase(getApplicationContext());
+         AppRepository repo = new AppRepository(getApplication());
+-        if(sharedPref.getInt(logged_in_user_key,-1) != -1){
++        if (sharedPref.getInt(logged_in_user_key, -1) != -1) {
+             Intent intent = PlayerHomePageActivity.PlayerHomePageIntentFactory(getApplicationContext());
+             startActivity(intent);
+         }
+-        //initialize the database
+-
+-//        userDAO = Room.databaseBuilder(this, AppDatabase.class, AppDatabase.DATABASE_NAME)
+-//                .allowMainThreadQueries()
+-//                .build()
+-//                .userDAO();
+-
+-
+-//        User admin  = new User("admin","admin",true);
+-//        User user = new User("user","user",false);
+ 
+ 
+         repo.getAllUsers();
+ 
+-        //add admin and user to the database if they do not exist
+-//        if(userDAO.getUserByUsername(admin.getUsername()).isEmpty()) {
+-//            userDAO.insert(admin);
+-//        }
+-//        if(userDAO.getUserByUsername(user.getUsername()).isEmpty()) {
+-//            userDAO.insert(user);
+-//        }
+ 
+         binding.signupButton.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+-                if(validateInput()){
++                if (validateInput()) {
+                     List<User> users = repo.getAllUsers();
+-                    for (User user: users){
+-                        if(user.getUsername().equals(binding.usernameInput.getText().toString())){
++                    for (User user : users) {
++                        if (user.getUsername().equals(binding.usernameInput.getText().toString())) {
+                             Toast.makeText(MainActivity.this, "Username already exists!", Toast.LENGTH_SHORT).show();
+                             return;
+                         }
+                     }
+                     repo.insertUser(createUserFromInput());
++                    repo.insertMessage(new Message(1, repo.getUserByUsername(binding.usernameInput.getText().toString()).get(0).getUserId(), "Welcome To Alex's Arcade App. I hope you enjoy", "Welcome"));
+ 
+                 }
+                 Toast.makeText(MainActivity.this, "Account created successfully!", Toast.LENGTH_SHORT).show();
+@@ -80,43 +64,41 @@
+         binding.loginButton.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+-                if(validateInput()){
++                if (validateInput()) {
+                     AppRepository appRepository = new AppRepository(getApplication());
+                     List<User> users = appRepository.getAllUsers();
+                     //check if the user exists in the database
+ 
+                     //if the user and password match, check if the user is an admin
+-                    for(User user: users) {
+-                        if(user.getUsername().equals(binding.usernameInput.getText().toString()) && user.getPassword().equals(binding.passwordInput.getText().toString())){
++                    for (User user : users) {
++                        if (user.getUsername().equals(binding.usernameInput.getText().toString()) && user.getPassword().equals(binding.passwordInput.getText().toString())) {
+ 
+-                                SharedPreferences.Editor editor = sharedPref.edit();
+-                                editor.putInt(logged_in_user_key, user.getUserId());
+-                                editor.apply();
+-                                Intent intent = PlayerHomePageActivity.PlayerHomePageIntentFactory(getApplicationContext());
+-                                startActivity(intent);
++                            SharedPreferences.Editor editor = sharedPref.edit();
++                            editor.putInt(logged_in_user_key, user.getUserId());
++                            editor.apply();
++                            Intent intent = PlayerHomePageActivity.PlayerHomePageIntentFactory(getApplicationContext());
++                            startActivity(intent);
+ 
+                             return;
+ 
+                         }
+                     }
+                     Toast.makeText(MainActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+-                    //if the user is an admin, display the admin activity
+-                    //if the user is not an admin, display the user activity
+-                    //if the user and password do not match, display an error message
++
+                 }
+             }
+         });
+     }
+-    private boolean validateInput(){
++
++    boolean validateInput() {
+         String username = binding.usernameInput.getText().toString();
+         String password = binding.passwordInput.getText().toString();
+-        //Toast.makeText(this, "Please enter a username and password", Toast.LENGTH_SHORT).show();
+-        // Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
++
+         return !username.isEmpty() && !password.isEmpty();
+     }
+ 
+-    private User createUserFromInput(){
+-        return new User(binding.usernameInput.getText().toString(),binding.passwordInput.getText().toString(),false);
++    private User createUserFromInput() {
++        return new User(binding.usernameInput.getText().toString(), binding.passwordInput.getText().toString(), false);
+     }
+ 
+     public static Intent MainActivityIntentFactory(Context context) {
+Index: app/src/main/java/com/example/cst338project2/userListAdapter.java
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/userListAdapter.java b/app/src/main/java/com/example/cst338project2/userListAdapter.java
+deleted file mode 100644
+--- a/app/src/main/java/com/example/cst338project2/userListAdapter.java	
++++ /dev/null	
+@@ -1,52 +0,0 @@
+-package com.example.cst338project2;
+-
+-import android.content.Context;
+-import android.view.LayoutInflater;
+-import android.view.View;
+-import android.view.ViewGroup;
+-import android.widget.TextView;
+-
+-import androidx.annotation.NonNull;
+-import androidx.recyclerview.widget.RecyclerView;
+-
+-public class userListAdapter extends RecyclerView.Adapter<userListAdapter.userListViewHolder> {
+-
+-    private final LayoutInflater layoutInflater;
+-    private Context mContext;
+-
+-    public userListAdapter(Context context) {
+-        layoutInflater = LayoutInflater.from(context);
+-        mContext = context;
+-    }
+-    @NonNull
+-    @Override
+-    public userListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+-        View itemView = layoutInflater.inflate(R.layout.showusers_recycler_item, parent, false);
+-        userListViewHolder viewHolder = new userListViewHolder(itemView);
+-        return viewHolder;
+-
+-
+-    }
+-
+-
+-    @Override
+-    public void onBindViewHolder(@NonNull userListViewHolder holder, int position) {
+-
+-    }
+-
+-    @Override
+-    public int getItemCount() {
+-        return 0;
+-    }
+-
+-    public class userListViewHolder extends RecyclerView.ViewHolder {
+-
+-        private TextView userItemView;
+-        private int mPosition;
+-
+-        public userListViewHolder(@NonNull View itemView) {
+-            super(itemView);
+-
+-        }
+-    }
+-}
+Index: app/src/main/java/com/example/cst338project2/ShowAllUsersViewModel.java
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/ShowAllUsersViewModel.java b/app/src/main/java/com/example/cst338project2/ShowAllUsersViewModel.java
+deleted file mode 100644
+--- a/app/src/main/java/com/example/cst338project2/ShowAllUsersViewModel.java	
++++ /dev/null	
+@@ -1,33 +0,0 @@
+-package com.example.cst338project2;
+-
+-import android.app.Application;
+-
+-import androidx.lifecycle.AndroidViewModel;
+-import androidx.lifecycle.LiveData;
+-
+-
+-import com.example.cst338project2.DB.AppRepository;
+-import com.example.cst338project2.DB.User;
+-
+-import java.util.List;
+-
+-public class ShowAllUsersViewModel extends AndroidViewModel {
+-    // TODO: Implement the ViewModel
+-    private AppRepository repo ;
+-
+-    private final LiveData<List<User>> allUsers;
+-
+-    public ShowAllUsersViewModel(Application application){
+-        super(application);
+-        repo = new AppRepository(application);
+-        allUsers = repo.getUsersLiveData();
+-    }
+-
+-    LiveData<List<User>> getAllUsers() {
+-        return allUsers;
+-    }
+-
+-    public void insert(User user){
+-        repo.insertUser(user);
+-    }
+-}
+\ No newline at end of file
+Index: app/src/main/java/com/example/cst338project2/ShowAllUsersFragment.java
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/ShowAllUsersFragment.java b/app/src/main/java/com/example/cst338project2/ShowAllUsersFragment.java
+deleted file mode 100644
+--- a/app/src/main/java/com/example/cst338project2/ShowAllUsersFragment.java	
++++ /dev/null	
+@@ -1,59 +0,0 @@
+-package com.example.cst338project2;
+-
+-import androidx.lifecycle.Observer;
+-import androidx.lifecycle.ViewModelProvider;
+-
+-import android.os.Bundle;
+-
+-import androidx.annotation.NonNull;
+-import androidx.annotation.Nullable;
+-import androidx.fragment.app.Fragment;
+-import androidx.recyclerview.widget.LinearLayoutManager;
+-import androidx.recyclerview.widget.RecyclerView;
+-
+-import android.view.LayoutInflater;
+-import android.view.View;
+-import android.view.ViewGroup;
+-
+-import com.example.cst338project2.DB.User;
+-
+-import java.util.List;
+-
+-public class ShowAllUsersFragment extends Fragment {
+-
+-    private ShowAllUsersViewModel mViewModel;
+-    private RecyclerView recyclerView;
+-    private ShowAllUsersListAdapter adapter;
+-
+-    public static ShowAllUsersFragment newInstance() {
+-        return new ShowAllUsersFragment();
+-    }
+-
+-    @Override
+-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+-                             @Nullable Bundle savedInstanceState) {
+-        View view = inflater.inflate(R.layout.fragment_show_all_users, container, false);
+-
+-        return view;
+-    }
+-
+-    @Override
+-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+-        super.onActivityCreated(savedInstanceState);
+-        mViewModel = new ViewModelProvider(this).get(ShowAllUsersViewModel.class);
+-
+-        // Initialize the adapter and set it to the RecyclerView
+-        adapter = new ShowAllUsersListAdapter(new ShowAllUsersListAdapter.UserDiff());
+-        recyclerView.setAdapter(adapter);
+-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+-
+-        // Observe the data and update the RecyclerView when the data changes
+-        mViewModel.getAllUsers().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
+-            @Override
+-            public void onChanged(@Nullable final List<User> users) {
+-                // Update the cached copy of the users in the adapter.
+-                adapter.submitList(users);
+-            }
+-        });
+-    }
+-}
+\ No newline at end of file
+Index: app/src/test/java/com/example/cst338project2/ExampleUnitTest.java
+===================================================================
+diff --git a/app/src/test/java/com/example/cst338project2/ExampleUnitTest.java b/app/src/test/java/com/example/cst338project2/ExampleUnitTest.java
+deleted file mode 100644
+--- a/app/src/test/java/com/example/cst338project2/ExampleUnitTest.java	
++++ /dev/null	
+@@ -1,17 +0,0 @@
+-package com.example.cst338project2;
+-
+-import org.junit.Test;
+-
+-import static org.junit.Assert.*;
+-
+-/**
+- * Example local unit test, which will execute on the development machine (host).
+- *
+- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+- */
+-public class ExampleUnitTest {
+-    @Test
+-    public void addition_isCorrect() {
+-        assertEquals(4, 2 + 2);
+-    }
+-}
+\ No newline at end of file
+Index: app/src/main/java/com/example/cst338project2/ShowAllUsersListAdapter.java
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/ShowAllUsersListAdapter.java b/app/src/main/java/com/example/cst338project2/ShowAllUsersListAdapter.java
+deleted file mode 100644
+--- a/app/src/main/java/com/example/cst338project2/ShowAllUsersListAdapter.java	
++++ /dev/null	
+@@ -1,39 +0,0 @@
+-package com.example.cst338project2;
+-
+-import android.util.Log;
+-import android.view.ViewGroup;
+-
+-import androidx.annotation.NonNull;
+-import androidx.recyclerview.widget.DiffUtil;
+-import androidx.recyclerview.widget.ListAdapter;
+-
+-import com.example.cst338project2.DB.User;
+-
+-public class ShowAllUsersListAdapter extends ListAdapter<User, ShowAllUsersViewHolder> {
+-
+-    public ShowAllUsersListAdapter(@NonNull DiffUtil.ItemCallback<User> diffCallback) {
+-        super(diffCallback);
+-    }
+-
+-    @NonNull
+-    public ShowAllUsersViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+-        return ShowAllUsersViewHolder.create(parent);
+-    }
+-
+-    public void onBindViewHolder(@NonNull ShowAllUsersViewHolder holder, int position) {
+-        User current = getItem(position);
+-        Log.i("ShowAllUsersListAdapter", "onBindViewHolder: " + current.getUsername());
+-        holder.bind(current.getUsername());
+-    }
+-
+-    static class UserDiff extends DiffUtil.ItemCallback<User> {
+-
+-        public boolean areItemsTheSame(@NonNull User oldItem, @NonNull User newItem) {
+-            return oldItem == newItem;
+-        }
+-
+-        public boolean areContentsTheSame(@NonNull User oldItem, @NonNull User newItem) {
+-            return oldItem.getUsername().equals(newItem.getUsername());
+-        }
+-    }
+-}
+Index: app/src/main/java/com/example/cst338project2/typeConverters/ListConverter.java
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/typeConverters/ListConverter.java b/app/src/main/java/com/example/cst338project2/typeConverters/ListConverter.java
+deleted file mode 100644
+--- a/app/src/main/java/com/example/cst338project2/typeConverters/ListConverter.java	
++++ /dev/null	
+@@ -1,7 +0,0 @@
+-package com.example.cst338project2.typeConverters;
+-
+-import androidx.room.TypeConverters;
+-
+-@TypeConverters
+-public class ListConverter {
+-}
+Index: app/src/main/java/com/example/cst338project2/ShowAllUsersViewHolder.java
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/ShowAllUsersViewHolder.java b/app/src/main/java/com/example/cst338project2/ShowAllUsersViewHolder.java
+deleted file mode 100644
+--- a/app/src/main/java/com/example/cst338project2/ShowAllUsersViewHolder.java	
++++ /dev/null	
+@@ -1,30 +0,0 @@
+-package com.example.cst338project2;
+-
+-import android.view.LayoutInflater;
+-import android.view.View;
+-import android.view.ViewGroup;
+-import android.widget.TextView;
+-
+-import androidx.annotation.NonNull;
+-import androidx.recyclerview.widget.RecyclerView;
+-
+-public class ShowAllUsersViewHolder extends RecyclerView.ViewHolder {
+-    private final TextView userTextView;
+-
+-    public ShowAllUsersViewHolder(@NonNull View itemView) {
+-        super(itemView);
+-        userTextView = itemView.findViewById(R.id.recyclerItemTextView);
+-    }
+-
+-    public void bind (String text){
+-        userTextView.setText(text);
+-    }
+-
+-    static ShowAllUsersViewHolder create (ViewGroup parent){
+-        View view = LayoutInflater.from(parent.getContext())
+-                .inflate(R.layout.showusers_recycler_item, parent, false);
+-        return new ShowAllUsersViewHolder(view);
+-    }
+-
+-
+-}
+Index: app/src/test/java/com/example/cst338project2/CheckGuessUnitTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/test/java/com/example/cst338project2/CheckGuessUnitTest.java b/app/src/test/java/com/example/cst338project2/CheckGuessUnitTest.java
+new file mode 100644
+--- /dev/null	
++++ b/app/src/test/java/com/example/cst338project2/CheckGuessUnitTest.java	
+@@ -0,0 +1,28 @@
++package com.example.cst338project2;
++
++import static org.junit.Assert.assertEquals;
++
++import org.junit.Test;
++
++/**
++ * Example local unit test, which will execute on the development machine (host).
++ *
++ * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
++ */
++public class CheckGuessUnitTest {
++    @Test
++    public void checkGuess() {
++        assertEquals(0,numberGuessingGameActivity.checkGuess("1",1));
++    }
++    @Test
++    public void checkGuess1() {
++        assertEquals(1,numberGuessingGameActivity.checkGuess("1",2));
++    }
++    @Test
++    public void checkGuess2() {
++        assertEquals(2,numberGuessingGameActivity.checkGuess("2",1));
++    }
++
++
++}
++
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\n    id 'com.android.application'\n}\n\nandroid {\n    namespace 'com.example.cst338project2'\n    compileSdk 34\n\n    defaultConfig {\n        applicationId \"com.example.cst338project2\"\n        minSdk 34\n        targetSdk 34\n        versionCode 1\n        versionName \"1.0\"\n\n        testInstrumentationRunner \"androidx.test.runner.AndroidJUnitRunner\"\n\n        javaCompileOptions {\n            annotationProcessorOptions {\n                arguments = [\"room.schemaLocation\": \"$projectDir/schemas\".toString()]\n            }\n        }\n    }\n\n    buildTypes {\n        release {\n            minifyEnabled false\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\n        }\n    }\n    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_1_8\n        targetCompatibility JavaVersion.VERSION_1_8\n    }\n\n    buildFeatures {\n        viewBinding true\n    }\n}\n\ndependencies {\n\n    implementation 'androidx.activity:activity:1.8.0'\n    implementation 'androidx.legacy:legacy-support-v4:1.0.0'\n    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'\n    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'\n    def room_version = \"2.6.1\"\n\n    implementation \"androidx.room:room-runtime:$room_version\"\n    annotationProcessor \"androidx.room:room-compiler:$room_version\"\n\n    implementation 'androidx.appcompat:appcompat:1.6.1'\n    implementation 'com.google.android.material:material:1.11.0'\n    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'\n    testImplementation 'junit:junit:4.13.2'\n    androidTestImplementation 'androidx.test.ext:junit:1.1.5'\n    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/build.gradle b/app/build.gradle
+--- a/app/build.gradle	
++++ b/app/build.gradle	
+@@ -39,7 +39,7 @@
+ }
+ 
+ dependencies {
+-
++    testImplementation 'org.robolectric:robolectric:4.6.1'
+     implementation 'androidx.activity:activity:1.8.0'
+     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'

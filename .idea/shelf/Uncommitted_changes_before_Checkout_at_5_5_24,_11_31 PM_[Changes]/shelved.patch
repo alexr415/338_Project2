@@ -1,0 +1,490 @@
+Index: app/src/main/java/com/example/cst338project2/numberGuessingGameActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.cst338project2;\n\nimport android.content.Context;\nimport android.content.Intent;\nimport android.content.SharedPreferences;\nimport android.os.Bundle;\nimport android.view.View;\nimport android.widget.Toast;\n\nimport androidx.activity.EdgeToEdge;\nimport androidx.appcompat.app.AppCompatActivity;\n\nimport com.example.cst338project2.DB.AppRepository;\nimport com.example.cst338project2.DB.Score;\nimport com.example.cst338project2.DB.User;\nimport com.example.cst338project2.databinding.ActivityNumberGuessingGameBinding;\n\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class numberGuessingGameActivity extends AppCompatActivity {\n\n    private ActivityNumberGuessingGameBinding binding;\n    private int guess;\n    public static final String GAME_TAG= \"NumberGuessingGame\";\n\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        EdgeToEdge.enable(this);\n        binding = ActivityNumberGuessingGameBinding.inflate(getLayoutInflater());\n        setContentView(binding.getRoot());\n\n        SharedPreferences sharedPref = this.getSharedPreferences(MainActivity.preference_file_key, Context.MODE_PRIVATE);\n\n\n        int number = (int) (Math.random() * 100 + 1);\n        AtomicInteger guessesLeft = new AtomicInteger(7);\n\n        AppRepository repo = new AppRepository(getApplication());\n\n        User user = repo.getUserByID(sharedPref.getInt(MainActivity.logged_in_user_key,-1)).get(0);\n        if(user.isAdmin()){\n            binding.adminNumberGuessAnswerTextView.setText(String.valueOf(number));\n        }\n\n        binding.previousHighScore.setText(\"Your High Score: \" + repo.getHighScoreByUserAndGame(user.getUserId(),GAME_TAG));\n\n\n        binding.guessesLeft.setText(\"Guesses Left: \" + guessesLeft.get());\n        binding.homeButton.setOnClickListener(v -> {\n            Intent intent = PlayerHomePageActivity.PlayerHomePageIntentFactory(getApplicationContext());\n            startActivity(intent);\n        });\n\n        binding.NumberGuessSubmitButton.setOnClickListener(v -> {\n            if(binding.NumberGuessInput.getText().toString().isEmpty()){\n                Toast.makeText(getApplicationContext(), \"Please enter a number\", Toast.LENGTH_SHORT).show();\n\n            }\n            else{\n                guess = Integer.parseInt(binding.NumberGuessInput.getText().toString());\n                if(guess == number){\n                    binding.numberGuessHint.setText(\"You guessed the number!\");\n                    binding.NumberGuessSubmitButton.setVisibility(View.INVISIBLE);\n                    repo.insertScore(new Score(user.getUserId(),guessesLeft.get(),GAME_TAG));\n                    binding.guessesLeft.setText(\"You Scored:\" + guessesLeft.get());\n                }\n                else if(guess < number){\n                    binding.numberGuessHint.setText(\"Guess Higher!\");\n                    guessesLeft.getAndDecrement();\n                    binding.guessesLeft.setText(\"Guesses Left: \" + guessesLeft.get());\n                    if(guessesLeft.get()==0){\n                        binding.numberGuessHint.setText(\"You ran out of guesses! The number was \" + number);\n                        binding.NumberGuessSubmitButton.setVisibility(View.INVISIBLE);\n                    }\n                }\n                else{\n                    binding.numberGuessHint.setText(\"Guess Lower!\");\n                    guessesLeft.getAndDecrement();\n                    binding.guessesLeft.setText(\"Guesses Left: \" + guessesLeft.get());\n                    if(guessesLeft.get()==0){\n                        binding.numberGuessHint.setText(\"You ran out of guesses! The number was \" + number);\n                        binding.NumberGuessSubmitButton.setVisibility(View.INVISIBLE);\n                    }\n                }\n            }\n\n        });\n    }\n\n    private void playGame(){\n\n    }\n\n\n\n\n    public static Intent numberGuessingGameActivityIntentFactory(Context context){\n\n        return new Intent(context, numberGuessingGameActivity.class);\n    }\n}
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/numberGuessingGameActivity.java b/app/src/main/java/com/example/cst338project2/numberGuessingGameActivity.java
+--- a/app/src/main/java/com/example/cst338project2/numberGuessingGameActivity.java	
++++ b/app/src/main/java/com/example/cst338project2/numberGuessingGameActivity.java	
+@@ -21,7 +21,7 @@
+ 
+     private ActivityNumberGuessingGameBinding binding;
+     private int guess;
+-    public static final String GAME_TAG= "NumberGuessingGame";
++    public static final String GAME_TAG = "NumberGuessingGame";
+ 
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+@@ -38,12 +38,12 @@
+ 
+         AppRepository repo = new AppRepository(getApplication());
+ 
+-        User user = repo.getUserByID(sharedPref.getInt(MainActivity.logged_in_user_key,-1)).get(0);
+-        if(user.isAdmin()){
++        User user = repo.getUserByID(sharedPref.getInt(MainActivity.logged_in_user_key, -1)).get(0);
++        if (user.isAdmin()) {
+             binding.adminNumberGuessAnswerTextView.setText(String.valueOf(number));
+         }
+ 
+-        binding.previousHighScore.setText("Your High Score: " + repo.getHighScoreByUserAndGame(user.getUserId(),GAME_TAG));
++        binding.previousHighScore.setText("Your High Score: " + repo.getHighScoreByUserAndGame(user.getUserId(), GAME_TAG));
+ 
+ 
+         binding.guessesLeft.setText("Guesses Left: " + guessesLeft.get());
+@@ -53,49 +53,61 @@
+         });
+ 
+         binding.NumberGuessSubmitButton.setOnClickListener(v -> {
+-            if(binding.NumberGuessInput.getText().toString().isEmpty()){
++            if (binding.NumberGuessInput.getText().toString().isEmpty()) {
+                 Toast.makeText(getApplicationContext(), "Please enter a number", Toast.LENGTH_SHORT).show();
+ 
+-            }
+-            else{
+-                guess = Integer.parseInt(binding.NumberGuessInput.getText().toString());
+-                if(guess == number){
+-                    binding.numberGuessHint.setText("You guessed the number!");
+-                    binding.NumberGuessSubmitButton.setVisibility(View.INVISIBLE);
+-                    repo.insertScore(new Score(user.getUserId(),guessesLeft.get(),GAME_TAG));
+-                    binding.guessesLeft.setText("You Scored:" + guessesLeft.get());
+-                }
+-                else if(guess < number){
+-                    binding.numberGuessHint.setText("Guess Higher!");
+-                    guessesLeft.getAndDecrement();
+-                    binding.guessesLeft.setText("Guesses Left: " + guessesLeft.get());
+-                    if(guessesLeft.get()==0){
+-                        binding.numberGuessHint.setText("You ran out of guesses! The number was " + number);
+-                        binding.NumberGuessSubmitButton.setVisibility(View.INVISIBLE);
+-                    }
+-                }
+-                else{
+-                    binding.numberGuessHint.setText("Guess Lower!");
+-                    guessesLeft.getAndDecrement();
+-                    binding.guessesLeft.setText("Guesses Left: " + guessesLeft.get());
+-                    if(guessesLeft.get()==0){
+-                        binding.numberGuessHint.setText("You ran out of guesses! The number was " + number);
+-                        binding.NumberGuessSubmitButton.setVisibility(View.INVISIBLE);
+-                    }
++            } else {
++
++                switch (checkGuess(binding.NumberGuessInput.getText().toString(), number)) {
++                    case 0:
++                        binding.numberGuessHint.setText("You guessed the number!");
++                        binding.NumberGuessSubmitButton.setVisibility(View.INVISIBLE);
++                        repo.insertScore(new Score(user.getUserId(), guessesLeft.get(), GAME_TAG));
++                        binding.guessesLeft.setText("You Scored:" + guessesLeft.get());
++                        break;
++                    case 1:
++                        binding.numberGuessHint.setText("Guess Higher!");
++                        guessesLeft.getAndDecrement();
++                        binding.guessesLeft.setText("Guesses Left: " + guessesLeft.get());
++                        if (guessesLeft.get() == 0) {
++                            binding.numberGuessHint.setText("You ran out of guesses! The number was " + number);
++                            binding.NumberGuessSubmitButton.setVisibility(View.INVISIBLE);
++                        }
++                        break;
++                    case 2:
++                        binding.numberGuessHint.setText("Guess Lower!");
++                        guessesLeft.getAndDecrement();
++                        binding.guessesLeft.setText("Guesses Left: " + guessesLeft.get());
++                        if (guessesLeft.get() == 0) {
++                            binding.numberGuessHint.setText("You ran out of guesses! The number was " + number);
++                            binding.NumberGuessSubmitButton.setVisibility(View.INVISIBLE);
++                        }
++                        break;
+                 }
++
+             }
+ 
+         });
+     }
+ 
+-    private void playGame(){
++     static int checkGuess(String guess, int number) {
++        if (guess.isEmpty()) {
++            return -1;
++        } else {
++            int guessInt = Integer.parseInt(guess);
++            if (guessInt == number) {
++                return 0;
++            } else if (guessInt < number) {
++                return 1;
++            } else {
++                return 2;
++            }
++        }
+ 
+     }
+-
+-
+ 
+ 
+-    public static Intent numberGuessingGameActivityIntentFactory(Context context){
++    public static Intent numberGuessingGameActivityIntentFactory(Context context) {
+ 
+         return new Intent(context, numberGuessingGameActivity.class);
+     }
+Index: app/src/main/java/com/example/cst338project2/AdminHomePage.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.cst338project2;\n\nimport android.content.Context;\nimport android.content.Intent;\nimport android.content.SharedPreferences;\nimport android.os.Bundle;\nimport android.view.View;\nimport android.widget.Toast;\n\nimport androidx.activity.EdgeToEdge;\nimport androidx.appcompat.app.AppCompatActivity;\nimport androidx.core.graphics.Insets;\nimport androidx.core.view.ViewCompat;\nimport androidx.core.view.WindowInsetsCompat;\nimport androidx.lifecycle.LiveData;\nimport androidx.lifecycle.Observer;\nimport androidx.recyclerview.widget.LinearLayoutManager;\nimport androidx.recyclerview.widget.RecyclerView;\n\nimport com.example.cst338project2.DB.AppRepository;\nimport com.example.cst338project2.DB.User;\nimport com.example.cst338project2.databinding.ActivityAdminHomePageBinding;\n\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class AdminHomePage extends AppCompatActivity {\n    private ActivityAdminHomePageBinding binding;\n    private userListAdapter userListAdptr;\n    LiveData<List<User>> userLiveData;\n\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        binding= ActivityAdminHomePageBinding.inflate(getLayoutInflater());\n        setContentView(binding.getRoot());\n\n        SharedPreferences sharedPref = this.getSharedPreferences(MainActivity.preference_file_key, Context.MODE_PRIVATE);\n\n        AppRepository repo = new AppRepository(getApplication());\n        ArrayList<User> users = repo.getAllUsers();\n        StringBuilder sb = new StringBuilder();\n        for (User user : users) {\n            sb.append(\"Username: \" + user.getUsername()+\"\\tUserID: \" +user.getUserId()+\"\\n\\n\");\n        }\n        binding.adminUserListTextView.setText(sb.toString());\n\n        userLiveData = repo.getUsersLiveData();\n\n        userLiveData.observe(this, new Observer<List<User>>() {\n            @Override\n            public void onChanged(List<User> users) {\n                StringBuilder sb = new StringBuilder();\n                for (User user : users) {\n                    sb.append(\"Username: \" + user.getUsername()+\"\\tUserID: \" +user.getUserId()+\"\\n\\n\");\n                }\n                binding.adminUserListTextView.setText(sb.toString());\n            }\n        });\n\n        binding.DeleteUserButton.setOnClickListener(new View.OnClickListener() {\n            @Override\n            public void onClick(View v) {\n                if(binding.userToDeleteIDinput.getText().toString().isEmpty()){\n                    Toast.makeText(getApplicationContext(), \"Please enter a UserID to delete\", Toast.LENGTH_SHORT).show();\n\n                } else if (repo.getUserByID(Integer.parseInt(binding.userToDeleteIDinput.getText().toString())).size() == 0){\n                    Toast.makeText(getApplicationContext(), \"User doesn't exist\", Toast.LENGTH_SHORT).show();\n                } else if (repo.getUserByID(Integer.parseInt(binding.userToDeleteIDinput.getText().toString())).get(0).isAdmin()) {\n                    Toast.makeText(getApplicationContext(), \"ADMINS ARE FOREVER\", Toast.LENGTH_SHORT).show();\n                } else{\n                    int id = Integer.parseInt(binding.userToDeleteIDinput.getText().toString());\n                    repo.deleteScoresByUserId(id);\n                    repo.deleteUserById(id);\n\n\n                }\n            }\n        });\n\n        binding.adminLogOutButton.setOnClickListener(new View.OnClickListener() {\n            @Override\n            public void onClick(View v) {\n                Intent intent = MainActivity.MainActivityIntentFactory(getApplicationContext());\n                startActivity(intent);\n                SharedPreferences.Editor editor = sharedPref.edit();\n                editor.putInt(MainActivity.logged_in_user_key, -1);\n                editor.apply();\n            }\n        });\n        binding.adminPlayButton.setOnClickListener(new View.OnClickListener() {\n            @Override\n            public void onClick(View v) {\n                Intent intent = PlayerHomePageActivity.PlayerHomePageIntentFactory(getApplicationContext());\n                startActivity(intent);\n            }\n        });\n    }\n    public static Intent AdminHomePageIntentFactory(Context context){\n\n        return new Intent(context, AdminHomePage.class);\n    }\n}
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/AdminHomePage.java b/app/src/main/java/com/example/cst338project2/AdminHomePage.java
+--- a/app/src/main/java/com/example/cst338project2/AdminHomePage.java	
++++ b/app/src/main/java/com/example/cst338project2/AdminHomePage.java	
+@@ -7,15 +7,9 @@
+ import android.view.View;
+ import android.widget.Toast;
+ 
+-import androidx.activity.EdgeToEdge;
+ import androidx.appcompat.app.AppCompatActivity;
+-import androidx.core.graphics.Insets;
+-import androidx.core.view.ViewCompat;
+-import androidx.core.view.WindowInsetsCompat;
+ import androidx.lifecycle.LiveData;
+ import androidx.lifecycle.Observer;
+-import androidx.recyclerview.widget.LinearLayoutManager;
+-import androidx.recyclerview.widget.RecyclerView;
+ 
+ import com.example.cst338project2.DB.AppRepository;
+ import com.example.cst338project2.DB.User;
+@@ -26,13 +20,13 @@
+ 
+ public class AdminHomePage extends AppCompatActivity {
+     private ActivityAdminHomePageBinding binding;
+-    private userListAdapter userListAdptr;
++
+     LiveData<List<User>> userLiveData;
+ 
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+-        binding= ActivityAdminHomePageBinding.inflate(getLayoutInflater());
++        binding = ActivityAdminHomePageBinding.inflate(getLayoutInflater());
+         setContentView(binding.getRoot());
+ 
+         SharedPreferences sharedPref = this.getSharedPreferences(MainActivity.preference_file_key, Context.MODE_PRIVATE);
+@@ -41,7 +35,7 @@
+         ArrayList<User> users = repo.getAllUsers();
+         StringBuilder sb = new StringBuilder();
+         for (User user : users) {
+-            sb.append("Username: " + user.getUsername()+"\tUserID: " +user.getUserId()+"\n\n");
++            sb.append("Username: " + user.getUsername() + "\tUserID: " + user.getUserId() + "\n\n");
+         }
+         binding.adminUserListTextView.setText(sb.toString());
+ 
+@@ -52,25 +46,34 @@
+             public void onChanged(List<User> users) {
+                 StringBuilder sb = new StringBuilder();
+                 for (User user : users) {
+-                    sb.append("Username: " + user.getUsername()+"\tUserID: " +user.getUserId()+"\n\n");
++                    sb.append("Username: " + user.getUsername() + "\tUserID: " + user.getUserId() + "\n\n");
+                 }
+                 binding.adminUserListTextView.setText(sb.toString());
+             }
+         });
+ 
++        binding.ClearHighScoresButton.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                repo.deleteAllScores();
++                Toast.makeText(getApplicationContext(), "All High Scores Cleared", Toast.LENGTH_SHORT).show();
++            }
++        });
++
+         binding.DeleteUserButton.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+-                if(binding.userToDeleteIDinput.getText().toString().isEmpty()){
++                if (binding.userToDeleteIDinput.getText().toString().isEmpty()) {
+                     Toast.makeText(getApplicationContext(), "Please enter a UserID to delete", Toast.LENGTH_SHORT).show();
+ 
+-                } else if (repo.getUserByID(Integer.parseInt(binding.userToDeleteIDinput.getText().toString())).size() == 0){
++                } else if (repo.getUserByID(Integer.parseInt(binding.userToDeleteIDinput.getText().toString())).size() == 0) {
+                     Toast.makeText(getApplicationContext(), "User doesn't exist", Toast.LENGTH_SHORT).show();
+                 } else if (repo.getUserByID(Integer.parseInt(binding.userToDeleteIDinput.getText().toString())).get(0).isAdmin()) {
+                     Toast.makeText(getApplicationContext(), "ADMINS ARE FOREVER", Toast.LENGTH_SHORT).show();
+-                } else{
++                } else {
+                     int id = Integer.parseInt(binding.userToDeleteIDinput.getText().toString());
+                     repo.deleteScoresByUserId(id);
++                    repo.deleteMessagesForReceiver(id);
+                     repo.deleteUserById(id);
+ 
+ 
+@@ -96,7 +99,8 @@
+             }
+         });
+     }
+-    public static Intent AdminHomePageIntentFactory(Context context){
++
++    public static Intent AdminHomePageIntentFactory(Context context) {
+ 
+         return new Intent(context, AdminHomePage.class);
+     }
+Index: app/src/main/res/layout/activity_number_guessing_game.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\n<androidx.constraintlayout.widget.ConstraintLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n        xmlns:tools=\"http://schemas.android.com/tools\"\n        xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n        android:id=\"@+id/main\"\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"match_parent\"\n        tools:context=\".numberGuessingGameActivity\">\n\n    <Button\n            android:text=\"Home\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:id=\"@+id/homeButton\"\n            app:layout_constraintTop_toTopOf=\"parent\"\n            android:layout_marginTop=\"24dp\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            android:layout_marginStart=\"24dp\" />\n\n    <TextView\n            android:text=\"Guess a Number between 1 and 100\"\n            android:layout_width=\"283dp\"\n            android:layout_height=\"32dp\"\n            android:id=\"@+id/textView2\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            app:layout_constraintTop_toTopOf=\"parent\"\n            app:layout_constraintBottom_toBottomOf=\"parent\"\n            app:layout_constraintVertical_bias=\"0.16\" />\n\n    <TextView\n            android:text=\"guesses remaining\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:id=\"@+id/guessesLeft\"\n            app:layout_constraintBottom_toTopOf=\"@+id/NumberGuessInput\"\n            android:layout_marginBottom=\"20dp\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            app:layout_constraintHorizontal_bias=\"0.501\" />\n\n    <TextView\n            android:text=\"Take a guess!\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:id=\"@+id/numberGuessHint\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            app:layout_constraintTop_toBottomOf=\"@+id/textView2\"\n            android:layout_marginTop=\"80dp\"\n            app:layout_constraintHorizontal_bias=\"0.498\" />\n\n    <EditText\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:inputType=\"number\"\n            android:ems=\"10\"\n            android:id=\"@+id/NumberGuessInput\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            app:layout_constraintTop_toBottomOf=\"@+id/textView2\"\n            android:layout_marginTop=\"152dp\"\n            app:layout_constraintHorizontal_bias=\"0.497\" />\n\n    <Button\n            android:text=\"Button\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:id=\"@+id/NumberGuessSubmitButton\"\n            app:layout_constraintTop_toBottomOf=\"@+id/NumberGuessInput\"\n            android:layout_marginTop=\"60dp\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            app:layout_constraintStart_toStartOf=\"parent\" />\n\n    <TextView\n            android:text=\"previous high score\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:id=\"@+id/previousHighScore\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            app:layout_constraintTop_toBottomOf=\"@+id/textView2\"\n            android:layout_marginTop=\"44dp\"\n            app:layout_constraintHorizontal_bias=\"0.498\" />\n\n    <TextView\n\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:id=\"@+id/adminNumberGuessAnswerTextView\"\n            app:layout_constraintTop_toTopOf=\"parent\"\n            android:layout_marginTop=\"40dp\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            android:layout_marginEnd=\"32dp\" />\n\n\n</androidx.constraintlayout.widget.ConstraintLayout>
+===================================================================
+diff --git a/app/src/main/res/layout/activity_number_guessing_game.xml b/app/src/main/res/layout/activity_number_guessing_game.xml
+--- a/app/src/main/res/layout/activity_number_guessing_game.xml	
++++ b/app/src/main/res/layout/activity_number_guessing_game.xml	
+@@ -63,7 +63,7 @@
+             app:layout_constraintHorizontal_bias="0.497" />
+ 
+     <Button
+-            android:text="Button"
++            android:text="Guess"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:id="@+id/NumberGuessSubmitButton"
+Index: app/src/main/java/com/example/cst338project2/DB/User.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.cst338project2.DB;\n\nimport androidx.annotation.NonNull;\nimport androidx.room.Entity;\nimport androidx.room.PrimaryKey;\n\n@Entity (tableName =AppDatabase.USER_TABLE)\npublic class User {\n\n    @PrimaryKey(autoGenerate = true)\n    private int userId;\n    private String username;\n\n    private String password;\n\n    private boolean isAdmin;\n\n\n    public User(String username, @NonNull String password, boolean isAdmin) {\n        this.username = username;\n        this.password = password;\n        this.isAdmin = isAdmin;\n    }\n\n    public boolean isAdmin() {\n        return isAdmin;\n    }\n\n    public int getUserId() {\n        return userId;\n    }\n\n    public void setUserId(int userId) {\n        this.userId = userId;\n    }\n\n    public void setAdmin(boolean admin) {\n        isAdmin = admin;\n    }\n\n    public String getUsername() {\n        return username;\n    }\n\n    public String getPassword() {\n        return password;\n    }\n\n    public void setUsername(String username) {\n        this.username = username;\n    }\n\n    public void setPassword(String password) {\n        this.password = password;\n    }\n\n    @Override\n    public String toString() {\n        return \"User{\" +\n                \"username='\" + username + '\\'' +\n                \", password='\" + password + '\\'' +\n                '}';\n    }\n}\n
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/DB/User.java b/app/src/main/java/com/example/cst338project2/DB/User.java
+--- a/app/src/main/java/com/example/cst338project2/DB/User.java	
++++ b/app/src/main/java/com/example/cst338project2/DB/User.java	
+@@ -4,7 +4,7 @@
+ import androidx.room.Entity;
+ import androidx.room.PrimaryKey;
+ 
+-@Entity (tableName =AppDatabase.USER_TABLE)
++@Entity(tableName = AppDatabase.USER_TABLE)
+ public class User {
+ 
+     @PrimaryKey(autoGenerate = true)
+Index: app/src/main/res/layout/activity_admin_home_page.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\n<androidx.constraintlayout.widget.ConstraintLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n        xmlns:tools=\"http://schemas.android.com/tools\"\n        xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n        android:id=\"@+id/main\"\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"match_parent\"\n        tools:context=\".AdminHomePage\">\n\n    <Button\n            android:text=\"Play\"\n            android:textSize=\"9sp\"\n            android:layout_width=\"81dp\"\n            android:layout_height=\"42dp\"\n            android:id=\"@+id/adminPlayButton\"\n            app:layout_constraintTop_toTopOf=\"parent\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            android:layout_marginTop=\"16dp\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            app:layout_constraintHorizontal_bias=\"0.066\" />\n\n    <TextView\n            android:id=\"@+id/adminGreetingTextView\"\n            android:layout_width=\"204dp\"\n            android:layout_height=\"41dp\"\n            android:text=\"Hello Admin\"\n            android:textSize=\"18sp\"\n            android:gravity=\"center\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            app:layout_constraintTop_toTopOf=\"parent\"\n            android:layout_marginTop=\"144dp\"\n            app:layout_constraintHorizontal_bias=\"0.497\" />\n\n    <TextView\n            android:id=\"@+id/playerHomePage\"\n            android:layout_width=\"250dp\"\n            android:layout_height=\"75dp\"\n            android:text=\"Admin Home Page\"\n            android:textSize=\"24sp\"\n            android:gravity=\"center\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            app:layout_constraintTop_toTopOf=\"parent\"\n            android:layout_marginTop=\"60dp\"\n            app:layout_constraintHorizontal_bias=\"0.496\" />\n\n    <Button\n            android:text=\"Delete User\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:id=\"@+id/DeleteUserButton\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            app:layout_constraintHorizontal_bias=\"0.498\"\n            app:layout_constraintTop_toBottomOf=\"@+id/userToDeleteIDinput\"\n            android:layout_marginTop=\"44dp\" />\n\n    <Button\n            android:text=\"Log Out\"\n            android:textSize=\"9sp\"\n            android:layout_width=\"81dp\"\n            android:layout_height=\"42dp\"\n            android:id=\"@+id/adminLogOutButton\"\n            app:layout_constraintTop_toTopOf=\"parent\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            android:layout_marginTop=\"16dp\"\n            android:layout_marginEnd=\"16dp\" />\n\n    <TextView\n            android:text=\"TextView\"\n            android:layout_width=\"220dp\"\n            android:layout_height=\"262dp\"\n            android:id=\"@+id/adminUserListTextView\"\n            app:layout_constraintTop_toBottomOf=\"@+id/adminGreetingTextView\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            android:layout_marginTop=\"48dp\"\n            app:layout_constraintHorizontal_bias=\"0.492\" />\n\n    <EditText\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:inputType=\"number\"\n            android:ems=\"10\"\n            android:hint=\"Enter User ID to Delete\"\n            android:id=\"@+id/userToDeleteIDinput\"\n            app:layout_constraintTop_toBottomOf=\"@+id/adminUserListTextView\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            android:layout_marginTop=\"16dp\"\n            app:layout_constraintHorizontal_bias=\"0.497\" />\n\n</androidx.constraintlayout.widget.ConstraintLayout>
+===================================================================
+diff --git a/app/src/main/res/layout/activity_admin_home_page.xml b/app/src/main/res/layout/activity_admin_home_page.xml
+--- a/app/src/main/res/layout/activity_admin_home_page.xml	
++++ b/app/src/main/res/layout/activity_admin_home_page.xml	
+@@ -91,4 +91,14 @@
+             android:layout_marginTop="16dp"
+             app:layout_constraintHorizontal_bias="0.497" />
+ 
++    <Button
++            android:text="Clear High Scores"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:id="@+id/ClearHighScoresButton"
++            app:layout_constraintTop_toBottomOf="@+id/DeleteUserButton"
++            android:layout_marginTop="16dp"
++            app:layout_constraintStart_toStartOf="parent"
++            app:layout_constraintEnd_toEndOf="parent" />
++
+ </androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+Index: app/src/main/java/com/example/cst338project2/DB/Score.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.cst338project2.DB;\n\nimport androidx.room.Entity;\nimport androidx.room.ForeignKey;\nimport androidx.room.PrimaryKey;\n\nimport java.util.Objects;\n\n@Entity(tableName = AppDatabase.SCORE_TABLE, foreignKeys = @ForeignKey(entity = User.class, parentColumns = \"userId\", childColumns = \"userId\"))\npublic class Score{\n    @PrimaryKey(autoGenerate = true)\n    private int scoreId;\n    private int userId;\n    private int score;\n    private String game;\n\n    public Score(int userId, int score, String game) {\n        this.userId = userId;\n        this.score = score;\n        this.game = game;\n    }\n\n    @Override\n    public boolean equals(Object o) {\n        if (this == o) return true;\n        if (o == null || getClass() != o.getClass()) return false;\n\n        Score score1 = (Score) o;\n        return getScoreId() == score1.getScoreId() && getUserId() == score1.getUserId() && getScore() == score1.getScore() && Objects.equals(getGame(), score1.getGame());\n    }\n\n    @Override\n    public int hashCode() {\n        int result = getScoreId();\n        result = 31 * result + getUserId();\n        result = 31 * result + getScore();\n        result = 31 * result + Objects.hashCode(getGame());\n        return result;\n    }\n\n    public int getScoreId() {\n        return scoreId;\n    }\n\n    public void setScoreId(int scoreId) {\n        this.scoreId = scoreId;\n    }\n\n    public int getUserId() {\n        return userId;\n    }\n\n    public void setUserId(int userId) {\n        this.userId = userId;\n    }\n\n    public int getScore() {\n        return score;\n    }\n\n    public void setScore(int score) {\n        this.score = score;\n    }\n\n    public String getGame() {\n        return game;\n    }\n\n    public void setGame(String game) {\n        this.game = game;\n    }\n}\n
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/DB/Score.java b/app/src/main/java/com/example/cst338project2/DB/Score.java
+--- a/app/src/main/java/com/example/cst338project2/DB/Score.java	
++++ b/app/src/main/java/com/example/cst338project2/DB/Score.java	
+@@ -7,7 +7,7 @@
+ import java.util.Objects;
+ 
+ @Entity(tableName = AppDatabase.SCORE_TABLE, foreignKeys = @ForeignKey(entity = User.class, parentColumns = "userId", childColumns = "userId"))
+-public class Score{
++public class Score {
+     @PrimaryKey(autoGenerate = true)
+     private int scoreId;
+     private int userId;
+Index: app/src/main/java/com/example/cst338project2/DB/Message.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.cst338project2.DB;\n\nimport androidx.room.Entity;\nimport androidx.room.ForeignKey;\nimport androidx.room.PrimaryKey;\n\nimport java.util.Objects;\n\n@Entity(tableName = AppDatabase.MESSAGE_TABLE,foreignKeys ={ @ForeignKey(entity = User.class, parentColumns = \"userId\", childColumns = \"senderId\"), @ForeignKey(entity = User.class, parentColumns = \"userId\", childColumns = \"receiverId\")})\npublic class Message {\n    @PrimaryKey(autoGenerate = true)\n    private int messageId;\n    private int senderId;\n    private int receiverId;\n    private String messageBody;\n    private String subject;\n\n    public Message(int senderId, int receiverId, String messageBody, String subject) {\n        this.senderId = senderId;\n        this.receiverId = receiverId;\n        this.messageBody = messageBody;\n        this.subject = subject;\n    }\n\n    @Override\n    public boolean equals(Object o) {\n        if (this == o) return true;\n        if (o == null || getClass() != o.getClass()) return false;\n\n        Message message = (Message) o;\n        return getMessageId() == message.getMessageId() && getSenderId() == message.getSenderId() && getReceiverId() == message.getReceiverId() && Objects.equals(getMessageBody(), message.getMessageBody()) && Objects.equals(getSubject(), message.getSubject());\n    }\n\n    @Override\n    public int hashCode() {\n        int result = getMessageId();\n        result = 31 * result + getSenderId();\n        result = 31 * result + getReceiverId();\n        result = 31 * result + Objects.hashCode(getMessageBody());\n        result = 31 * result + Objects.hashCode(getSubject());\n        return result;\n    }\n\n    public int getMessageId() {\n        return messageId;\n    }\n\n    public void setMessageId(int messageId) {\n        this.messageId = messageId;\n    }\n\n    public int getSenderId() {\n        return senderId;\n    }\n\n    public void setSenderId(int senderId) {\n        this.senderId = senderId;\n    }\n\n    public int getReceiverId() {\n        return receiverId;\n    }\n\n    public void setReceiverId(int receiverId) {\n        this.receiverId = receiverId;\n    }\n\n    public String getMessageBody() {\n        return messageBody;\n    }\n\n    public void setMessageBody(String messageBody) {\n        this.messageBody = messageBody;\n    }\n\n    public String getSubject() {\n        return subject;\n    }\n\n    public void setSubject(String subject) {\n        this.subject = subject;\n    }\n}\n
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/DB/Message.java b/app/src/main/java/com/example/cst338project2/DB/Message.java
+--- a/app/src/main/java/com/example/cst338project2/DB/Message.java	
++++ b/app/src/main/java/com/example/cst338project2/DB/Message.java	
+@@ -6,7 +6,7 @@
+ 
+ import java.util.Objects;
+ 
+-@Entity(tableName = AppDatabase.MESSAGE_TABLE,foreignKeys ={ @ForeignKey(entity = User.class, parentColumns = "userId", childColumns = "senderId"), @ForeignKey(entity = User.class, parentColumns = "userId", childColumns = "receiverId")})
++@Entity(tableName = AppDatabase.MESSAGE_TABLE, foreignKeys = {@ForeignKey(entity = User.class, parentColumns = "userId", childColumns = "senderId"), @ForeignKey(entity = User.class, parentColumns = "userId", childColumns = "receiverId")})
+ public class Message {
+     @PrimaryKey(autoGenerate = true)
+     private int messageId;
+Index: app/src/main/res/layout/fragment_game_options.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\n<androidx.constraintlayout.widget.ConstraintLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n        xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n        xmlns:tools=\"http://schemas.android.com/tools\"\n        android:layout_width=\"match_parent\"\n        android:layout_height=\"match_parent\"\n        tools:context=\".typeConverters.GameOptions\">\n\n\n    <Button\n            android:text=\"Number Guessing game\"\n            android:layout_width=\"172dp\"\n            android:layout_height=\"87dp\"\n            android:id=\"@+id/numGuessingGameSelectionButton\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            app:layout_constraintTop_toTopOf=\"parent\"\n            android:layout_marginTop=\"132dp\"\n            android:layout_marginStart=\"56dp\" />\n\n    <Button\n            android:text=\"Button\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:id=\"@+id/button4\"\n            app:layout_constraintTop_toTopOf=\"parent\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            android:layout_marginTop=\"132dp\"\n            android:layout_marginEnd=\"56dp\" />\n\n    <Button\n            android:text=\"Button\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:id=\"@+id/button5\"\n            app:layout_constraintBottom_toBottomOf=\"parent\"\n            app:layout_constraintStart_toStartOf=\"parent\"\n            android:layout_marginStart=\"56dp\"\n            android:layout_marginBottom=\"92dp\" />\n\n    <Button\n            android:text=\"Button\"\n            android:layout_width=\"wrap_content\"\n            android:layout_height=\"wrap_content\"\n            android:id=\"@+id/button6\"\n            app:layout_constraintBottom_toBottomOf=\"parent\"\n            app:layout_constraintEnd_toEndOf=\"parent\"\n            android:layout_marginEnd=\"52dp\"\n            android:layout_marginBottom=\"92dp\" />\n</androidx.constraintlayout.widget.ConstraintLayout>
+===================================================================
+diff --git a/app/src/main/res/layout/fragment_game_options.xml b/app/src/main/res/layout/fragment_game_options.xml
+--- a/app/src/main/res/layout/fragment_game_options.xml	
++++ b/app/src/main/res/layout/fragment_game_options.xml	
+@@ -4,7 +4,7 @@
+         xmlns:tools="http://schemas.android.com/tools"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+-        tools:context=".typeConverters.GameOptions">
++        tools:context=".GameOptions">
+ 
+ 
+     <Button
+@@ -17,33 +17,4 @@
+             android:layout_marginTop="132dp"
+             android:layout_marginStart="56dp" />
+ 
+-    <Button
+-            android:text="Button"
+-            android:layout_width="wrap_content"
+-            android:layout_height="wrap_content"
+-            android:id="@+id/button4"
+-            app:layout_constraintTop_toTopOf="parent"
+-            app:layout_constraintEnd_toEndOf="parent"
+-            android:layout_marginTop="132dp"
+-            android:layout_marginEnd="56dp" />
+-
+-    <Button
+-            android:text="Button"
+-            android:layout_width="wrap_content"
+-            android:layout_height="wrap_content"
+-            android:id="@+id/button5"
+-            app:layout_constraintBottom_toBottomOf="parent"
+-            app:layout_constraintStart_toStartOf="parent"
+-            android:layout_marginStart="56dp"
+-            android:layout_marginBottom="92dp" />
+-
+-    <Button
+-            android:text="Button"
+-            android:layout_width="wrap_content"
+-            android:layout_height="wrap_content"
+-            android:id="@+id/button6"
+-            app:layout_constraintBottom_toBottomOf="parent"
+-            app:layout_constraintEnd_toEndOf="parent"
+-            android:layout_marginEnd="52dp"
+-            android:layout_marginBottom="92dp" />
+ </androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+Index: app/src/main/java/com/example/cst338project2/typeConverters/GameOptions.java
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/typeConverters/GameOptions.java b/app/src/main/java/com/example/cst338project2/GameOptions.java
+rename from app/src/main/java/com/example/cst338project2/typeConverters/GameOptions.java
+rename to app/src/main/java/com/example/cst338project2/GameOptions.java
+--- a/app/src/main/java/com/example/cst338project2/typeConverters/GameOptions.java	
++++ b/app/src/main/java/com/example/cst338project2/GameOptions.java	
+@@ -1,19 +1,15 @@
+-package com.example.cst338project2.typeConverters;
++package com.example.cst338project2;
+ 
+ import android.content.Intent;
+ import android.os.Bundle;
+-
+-import androidx.annotation.NonNull;
+-import androidx.fragment.app.Fragment;
+-
+ import android.view.LayoutInflater;
+ import android.view.View;
+ import android.view.ViewGroup;
+ 
+-import com.example.cst338project2.R;
+-import com.example.cst338project2.databinding.ActivityNumberGuessingGameBinding;
++import androidx.annotation.NonNull;
++import androidx.fragment.app.Fragment;
++
+ import com.example.cst338project2.databinding.FragmentGameOptionsBinding;
+-import com.example.cst338project2.numberGuessingGameActivity;
+ 
+ /**
+  * A simple {@link Fragment} subclass.
+@@ -80,9 +76,6 @@
+         binding = FragmentGameOptionsBinding.bind(view);
+ 
+ 
+-
+-
+-
+         binding.numGuessingGameSelectionButton.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+Index: app/src/main/java/com/example/cst338project2/DB/ScoreDAO.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.cst338project2.DB;\n\nimport androidx.room.Dao;\nimport androidx.room.Delete;\nimport androidx.room.Insert;\nimport androidx.room.Query;\nimport androidx.room.Update;\n\nimport java.util.ArrayList;\nimport java.util.List;\n\n@Dao\npublic interface ScoreDAO {\n    @Insert\n    void insert(Score... score);\n    @Update\n    void update(Score... score);\n    @Delete\n    void delete(Score... score);\n\n    @Query(\"SELECT * FROM \" + AppDatabase.SCORE_TABLE)\n    List<Score> getScores();\n\n    @Query(\"SELECT * FROM \" + AppDatabase.SCORE_TABLE + \" WHERE game = :game\")\n    List<Score> getScoreByGame (String game);\n\n    @Query(\"SELECT max(score) FROM \" + AppDatabase.SCORE_TABLE + \" WHERE userId = :user_id AND game=:game\")\n    int getHighScoreByUserAndGame(int user_id, String game);\n\n    @Query(\"SELECT max(score) FROM \" + AppDatabase.SCORE_TABLE + \" WHERE game=:game\")\n    int getHighScoreByGame(String game);\n\n    @Query(\"DELETE FROM \" + AppDatabase.SCORE_TABLE + \" WHERE userId = :id\")\n    void deleteScoresByUserId(int id);\n\n}\n
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/DB/ScoreDAO.java b/app/src/main/java/com/example/cst338project2/DB/ScoreDAO.java
+--- a/app/src/main/java/com/example/cst338project2/DB/ScoreDAO.java	
++++ b/app/src/main/java/com/example/cst338project2/DB/ScoreDAO.java	
+@@ -13,8 +13,10 @@
+ public interface ScoreDAO {
+     @Insert
+     void insert(Score... score);
++
+     @Update
+     void update(Score... score);
++
+     @Delete
+     void delete(Score... score);
+ 
+@@ -22,7 +24,7 @@
+     List<Score> getScores();
+ 
+     @Query("SELECT * FROM " + AppDatabase.SCORE_TABLE + " WHERE game = :game")
+-    List<Score> getScoreByGame (String game);
++    List<Score> getScoreByGame(String game);
+ 
+     @Query("SELECT max(score) FROM " + AppDatabase.SCORE_TABLE + " WHERE userId = :user_id AND game=:game")
+     int getHighScoreByUserAndGame(int user_id, String game);
+@@ -32,5 +34,7 @@
+ 
+     @Query("DELETE FROM " + AppDatabase.SCORE_TABLE + " WHERE userId = :id")
+     void deleteScoresByUserId(int id);
++    @Query("DELETE FROM " + AppDatabase.SCORE_TABLE)
++    void deleteAllScores();
+ 
+ }
+Index: app/src/main/java/com/example/cst338project2/DB/UserDAO.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.cst338project2.DB;\n\nimport androidx.lifecycle.LiveData;\nimport androidx.room.Dao;\nimport androidx.room.Delete;\nimport androidx.room.Insert;\nimport androidx.room.Query;\nimport androidx.room.Update;\n\n\nimport java.util.ArrayList;\nimport java.util.List;\n\n@Dao\npublic interface UserDAO {\n    @Insert\n    void insert(User... user);\n    @Update\n    void update(User... user);\n    @Delete\n    void delete(User... user);\n\n    @Query(\"SELECT * FROM \" + AppDatabase.USER_TABLE)\n    List<User> getUsers();\n\n    @Query(\"SELECT * FROM \" + AppDatabase.USER_TABLE)\n    LiveData<List<User>> getUsersLiveData();\n\n\n    @Query(\"SELECT * FROM \" + AppDatabase.USER_TABLE + \" WHERE userId = :id\")\n    List<User> getUserByID(int id);\n\n    @Query(\"SELECT * FROM \" + AppDatabase.USER_TABLE + \" WHERE username = :username\")\n    List<User> getUserByUsername(String username);\n\n    @Query(\"DELETE FROM \" + AppDatabase.USER_TABLE + \" WHERE userId = :id\")\n    void deleteUserById(int id);\n\n\n}\n
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/DB/UserDAO.java b/app/src/main/java/com/example/cst338project2/DB/UserDAO.java
+--- a/app/src/main/java/com/example/cst338project2/DB/UserDAO.java	
++++ b/app/src/main/java/com/example/cst338project2/DB/UserDAO.java	
+@@ -15,8 +15,10 @@
+ public interface UserDAO {
+     @Insert
+     void insert(User... user);
++
+     @Update
+     void update(User... user);
++
+     @Delete
+     void delete(User... user);
+ 
+Index: app/src/main/java/com/example/cst338project2/HighScoresDisplay.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.cst338project2;\n\nimport android.content.Context;\nimport android.content.Intent;\nimport android.os.Bundle;\n\nimport androidx.annotation.NonNull;\nimport androidx.fragment.app.Fragment;\n\nimport android.view.LayoutInflater;\nimport android.view.View;\nimport android.view.ViewGroup;\n\nimport com.example.cst338project2.DB.AppRepository;\nimport com.example.cst338project2.databinding.FragmentGameOptionsBinding;\nimport com.example.cst338project2.databinding.FragmentHighScoresDisplayBinding;\n\n/**\n * A simple {@link Fragment} subclass.\n * Use the {@link HighScoresDisplay#newInstance} factory method to\n * create an instance of this fragment.\n */\npublic class HighScoresDisplay extends Fragment {\n\n    // TODO: Rename parameter arguments, choose names that match\n    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER\n    private static final String ARG_PARAM1 = \"param1\";\n    private static final String ARG_PARAM2 = \"param2\";\n\n    // TODO: Rename and change types of parameters\n    private String mParam1;\n    private String mParam2;\n\n    public HighScoresDisplay() {\n        // Required empty public constructor\n    }\n\n    /**\n     * Use this factory method to create a new instance of\n     * this fragment using the provided parameters.\n     *\n     * @param param1 Parameter 1.\n     * @param param2 Parameter 2.\n     * @return A new instance of fragment HighScoresDisplay.\n     */\n    // TODO: Rename and change types and number of parameters\n    public static HighScoresDisplay newInstance(String param1, String param2) {\n        HighScoresDisplay fragment = new HighScoresDisplay();\n        Bundle args = new Bundle();\n        args.putString(ARG_PARAM1, param1);\n        args.putString(ARG_PARAM2, param2);\n        fragment.setArguments(args);\n        return fragment;\n    }\n\n    @Override\n    public void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        if (getArguments() != null) {\n            mParam1 = getArguments().getString(ARG_PARAM1);\n            mParam2 = getArguments().getString(ARG_PARAM2);\n        }\n    }\n\n    @Override\n    public View onCreateView(LayoutInflater inflater, ViewGroup container,\n                             Bundle savedInstanceState) {\n        // Inflate the layout for this fragment\n        return inflater.inflate(R.layout.fragment_high_scores_display, container, false);\n    }\n    private FragmentHighScoresDisplayBinding binding;\n    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {\n        super.onViewCreated(view, savedInstanceState);\n\n\n        binding = FragmentHighScoresDisplayBinding.bind(view);\n\n        AppRepository repo = new AppRepository(getActivity().getApplication());\n        repo.getHighScoreByGame(numberGuessingGameActivity.GAME_TAG);\n\n        binding.highScoreFragmentTextView.setText(\"High Score: \" + repo.getHighScoreByGame(numberGuessingGameActivity.GAME_TAG));\n        \n\n\n    }\n\n}
+===================================================================
+diff --git a/app/src/main/java/com/example/cst338project2/HighScoresDisplay.java b/app/src/main/java/com/example/cst338project2/HighScoresDisplay.java
+--- a/app/src/main/java/com/example/cst338project2/HighScoresDisplay.java	
++++ b/app/src/main/java/com/example/cst338project2/HighScoresDisplay.java	
+@@ -68,7 +68,9 @@
+         // Inflate the layout for this fragment
+         return inflater.inflate(R.layout.fragment_high_scores_display, container, false);
+     }
++
+     private FragmentHighScoresDisplayBinding binding;
++
+     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+         super.onViewCreated(view, savedInstanceState);
+ 
+@@ -79,7 +81,6 @@
+         repo.getHighScoreByGame(numberGuessingGameActivity.GAME_TAG);
+ 
+         binding.highScoreFragmentTextView.setText("High Score: " + repo.getHighScoreByGame(numberGuessingGameActivity.GAME_TAG));
+-        
+ 
+ 
+     }
